@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dry-struct"
+require "active_support/core_ext/hash/indifferent_access"
 
 module Serper
   module Api
@@ -27,6 +28,7 @@ module Serper
         private
 
         def rename_keys(attributes)
+          attributes.symbolize_keys!
           attributes[:reviews] = attributes.delete(:ratingCount) if attributes.key?(:ratingCount)
           attributes[:phone_number] = attributes.delete(:phoneNumber) if attributes.key?(:phoneNumber)
           attributes
