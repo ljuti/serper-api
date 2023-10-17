@@ -7,8 +7,9 @@ require "serper/api/responses"
 module Serper
   module Api
     class Client
-      def initialize(config = Config.new)
+      def initialize(config = Config.new, debug: false)
         @config = config
+        @debug = debug
       end
 
       def places(query)
@@ -40,7 +41,7 @@ module Serper
       def to_places(payload)
         Responses::Places.new(
           search_parameters: Responses::SearchParameters.new(payload["search_parameters"]),
-          places: payload["places"].map { |place| Responses::Place.new(place) },
+          places: payload["places"].map { |place| Responses::Place.new(transform_hash(place)) },
         )
       end
 
@@ -48,8 +49,16 @@ module Serper
         @connection ||= Faraday.new(url: config.api_url) do |app|
           app.request :json
           app.response :json
+          app.response :logger, ::Logger.new(STDOUT), bodies: true if @debug
           app.adapter :async_http
         end
+      end
+
+      def transform_hash(place)
+        place.symbolize_keys!
+        place[:reviews] = place.delete(:ratingCount) if place.key?(:ratingCount)
+        place[:phone_number] = place.delete(:phoneNumber) if place.key?(:phoneNumber)
+        place
       end
     end
   end

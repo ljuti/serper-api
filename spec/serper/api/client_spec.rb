@@ -9,7 +9,7 @@ module Serper
     RSpec.describe Client do
       describe "initialization" do
         it "initializes with a config" do
-          expect(described_class.new(config: Config.new)).to be_a(described_class)
+          expect(described_class.new(Config.new)).to be_a(described_class)
         end
       end
 
@@ -22,6 +22,15 @@ module Serper
             it "returns a response" do
               VCR.use_cassette("client/places") do
                 expect(client.places(query)).to be_a(Responses::Places)
+              end
+            end
+
+            it "contains a valid Places object" do
+              VCR.use_cassette("client/places/valid") do
+                place = client.places(query).places[1]
+                expect(place).to be_a(Responses::Place)
+                expect(place.reviews).not_to be_nil
+                expect(place.phone_number).not_to be_nil
               end
             end
           end
