@@ -36,12 +36,14 @@ module Serper
           end
 
           context "with a batch places query" do
-            let(:client) { described_class.new }
+            let(:client) { described_class.new(debug: true) }
             let(:query) { Queries::BatchPlaces.new(places: [Queries::Places.new(q: "apple inc"), Queries::Places.new(q: "tesla inc")]) }
 
             it "returns a response" do
               VCR.use_cassette("client/batch_places") do
-                expect(client.places(query)).to all(be_a(Responses::Places))
+                result = client.places(query)
+                expect(result).to all(be_a(Responses::Places))
+                puts result.first.inspect
               end
             end
           end

@@ -40,7 +40,7 @@ module Serper
 
       def to_places(payload)
         Responses::Places.new(
-          search_parameters: Responses::SearchParameters.new(payload["search_parameters"]),
+          search_parameters: Responses::SearchParameters.new(payload["searchParameters"]),
           places: payload["places"].map { |place| Responses::Place.new(transform_hash(place)) },
         )
       end
